@@ -38,15 +38,15 @@ public class UserInterceptor implements HandlerInterceptor {
         return true;
     }
 
-    private User createUser(User userInfo) {
+    private User createUser(UserInfo userInfo) {
         User user = userService.createUser(userInfo.getSubject(), userInfo.getUsername());
         log.debug("Created new user. {}", user);
         return user;
     }
 
-    private User getUserInfo(JwtAuthenticationToken token) {
+    private UserInfo getUserInfo(JwtAuthenticationToken token) {
         Jwt principal = (Jwt) token.getPrincipal();
-        return User.builder()
+        return UserInfo.builder()
                 .subject(principal.getSubject())
                 .username(principal.getClaim("username"))
                 .build();

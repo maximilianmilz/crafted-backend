@@ -5,7 +5,6 @@ package de.crafted.api.service.user.jooq;
 
 
 import de.crafted.api.service.user.jooq.tables.User;
-import de.crafted.api.service.user.jooq.tables.UserTag;
 
 
 /**
@@ -18,9 +17,4 @@ public class Tables {
      * The table <code>user</code>.
      */
     public static final User USER = User.USER;
-
-    /**
-     * The table <code>user_tag</code>.
-     */
-    public static final UserTag USER_TAG = UserTag.USER_TAG;
 }

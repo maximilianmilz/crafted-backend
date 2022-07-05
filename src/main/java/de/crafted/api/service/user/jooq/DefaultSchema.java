@@ -5,7 +5,6 @@ package de.crafted.api.service.user.jooq;
 
 
 import de.crafted.api.service.user.jooq.tables.User;
-import de.crafted.api.service.user.jooq.tables.UserTag;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,11 +33,6 @@ public class DefaultSchema extends SchemaImpl {
     public final User USER = User.USER;
 
     /**
-     * The table <code>user_tag</code>.
-     */
-    public final UserTag USER_TAG = UserTag.USER_TAG;
-
-    /**
      * No further instances allowed
      */
     private DefaultSchema() {
@@ -54,7 +48,6 @@ public class DefaultSchema extends SchemaImpl {
     @Override
     public final List<Table<?>> getTables() {
         return Arrays.<Table<?>>asList(
-            User.USER,
-            UserTag.USER_TAG);
+            User.USER);
     }
 }

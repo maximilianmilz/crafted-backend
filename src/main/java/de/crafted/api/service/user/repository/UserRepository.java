@@ -1,8 +1,10 @@
 package de.crafted.api.service.user.repository;
 
 import static de.crafted.api.service.user.jooq.tables.User.USER;
+import static de.crafted.api.service.common.jooq.tables.UserTag.USER_TAG;
 
 import de.crafted.api.service.user.jooq.tables.records.UserRecord;
+import de.crafted.api.service.common.jooq.tables.records.UserTagRecord;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
@@ -31,6 +33,12 @@ public class UserRepository {
         return context.selectFrom(USER)
                 .where(USER.SUBJECT.eq(subject))
                 .fetchOptional();
+    }
+
+    public List<UserTagRecord> findUserTagsById(long userId) {
+        return context.selectFrom(USER_TAG)
+                .where(USER_TAG.USER_ID.eq(userId))
+                .fetch();
     }
 
     public UserRecord create(UserRecord userRecord) {

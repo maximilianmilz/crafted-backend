@@ -5,7 +5,6 @@ package de.crafted.api.service.ticket.jooq;
 
 
 import de.crafted.api.service.ticket.jooq.tables.Ticket;
-import de.crafted.api.service.ticket.jooq.tables.TicketTag;
 
 
 /**
@@ -18,9 +17,4 @@ public class Tables {
      * The table <code>ticket</code>.
      */
     public static final Ticket TICKET = Ticket.TICKET;
-
-    /**
-     * The table <code>ticket_tag</code>.
-     */
-    public static final TicketTag TICKET_TAG = TicketTag.TICKET_TAG;
 }

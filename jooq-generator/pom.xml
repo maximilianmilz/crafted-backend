@@ -76,7 +76,7 @@
                             </jdbc>
                             <generator>
                                 <database>
-                                    <includes>user|user_tag</includes>
+                                    <includes>user</includes>
                                     <inputSchema>public</inputSchema>
                                     <outputSchemaToDefault>true</outputSchemaToDefault>
                                 </database>
@@ -105,7 +105,7 @@
                             </jdbc>
                             <generator>
                                 <database>
-                                    <includes>ticket|ticket_tag</includes>
+                                    <includes>ticket</includes>
                                     <inputSchema>public</inputSchema>
                                     <outputSchemaToDefault>true</outputSchemaToDefault>
                                 </database>
@@ -114,6 +114,35 @@
                                 </generate>
                                 <target>
                                     <packageName>de.crafted.api.service.ticket.jooq</packageName>
+                                    <directory>../src/main/java</directory>
+                                </target>
+                            </generator>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>crafted-tag-schema</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <jdbc>
+                                <driver>${spring.datasource.driver-class-name}</driver>
+                                <url>${spring.datasource.url}</url>
+                                <user>${spring.datasource.username}</user>
+                                <password>${spring.datasource.password}</password>
+                            </jdbc>
+                            <generator>
+                                <database>
+                                    <includes>tag|ticket_tag|user_tag</includes>
+                                    <inputSchema>public</inputSchema>
+                                    <outputSchemaToDefault>true</outputSchemaToDefault>
+                                </database>
+                                <generate>
+                                    <javaTimeTypes>true</javaTimeTypes>
+                                </generate>
+                                <target>
+                                    <packageName>de.crafted.api.service.common.jooq</packageName>
                                     <directory>../src/main/java</directory>
                                 </target>
                             </generator>

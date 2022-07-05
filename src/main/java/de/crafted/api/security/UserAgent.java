@@ -1,10 +1,15 @@
 package de.crafted.api.security;
 
+import de.crafted.api.controller.execption.ResourceNotFoundException;
 import de.crafted.api.service.user.UserService;
 import de.crafted.api.service.user.model.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -34,11 +39,20 @@ public class UserAgent {
         return hasAuthority("ROLE_" + roleName);
     }
 
-    public String getUsername() {
-        return getContext().getAuthentication().getName();
+    public User getUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth instanceof JwtAuthenticationToken) {
+            String subject = getSubFromToken((JwtAuthenticationToken) auth);
+
+            return userService.getUser(subject).orElseThrow();
+        } else {
+            throw new ResourceNotFoundException();
+        }
     }
 
-    public User getUser() {
-        return userService.getUser(getUsername()).orElseThrow();
+    private String getSubFromToken(JwtAuthenticationToken token) {
+        Jwt principal = (Jwt) token.getPrincipal();
+        return principal.getSubject();
     }
+
 }
