@@ -24,7 +24,7 @@ CREATE TABLE ticket
     description TEXT                          NOT NULL,
     status      STATUS                        NOT NULL,
     created     TIMESTAMP                     NOT NULL,
-    account_id  BIGINT REFERENCES "user" (id) NOT NULL,
+    user_id     BIGINT REFERENCES "user" (id) NOT NULL,
     assigned_to BIGINT REFERENCES "user" (id)
 );
 

@@ -1,8 +1,11 @@
 package de.crafted.api.service.user;
 
 import de.crafted.api.controller.execption.ResourceNotFoundException;
+import de.crafted.api.controller.model.UserProfileInput;
 import de.crafted.api.service.common.mapper.TagMapper;
+import de.crafted.api.service.ticket.TicketService;
 import de.crafted.api.service.user.jooq.tables.records.UserRecord;
+import de.crafted.api.service.user.mapper.UserMapper;
 import de.crafted.api.service.user.model.User;
 import de.crafted.api.service.user.model.UserProfile;
 import de.crafted.api.service.user.repository.UserRepository;
@@ -10,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository repository;
+    private final TicketService ticketService;
 
     public User createUser(String subject, String username) {
         var record = new UserRecord();
@@ -30,61 +33,66 @@ public class UserService {
         record.setVerified(false);
         record.setUserCreateDate(ZonedDateTime.now().toLocalDateTime());
 
-        return map(repository.create(record));
+        return UserMapper.map(repository.create(record));
     }
 
-    public Optional<User> getUser(String subject) {
-        return repository.findBySubject(subject).map(this::map);
+    public Optional<User> findBySubject(String subject) {
+        return repository.findBySubject(subject)
+                .map(UserMapper::map);
     }
 
-    public Optional<User> getUser(long id) {
-        return repository.findById(id).map(this::map);
+    private Optional<User> findById(long id) {
+        return repository.findById(id)
+                .map(UserMapper::map);
     }
 
-    public List<User> getUsers() {
+    public List<User> findAll() {
         return repository.findAll()
                 .stream()
-                .map(this::map)
+                .map(UserMapper::map)
                 .collect(Collectors.toList());
     }
 
     public UserProfile getProfile(long id) {
-        var user = getUser(id).orElseThrow(ResourceNotFoundException::new);
+        var user = findById(id)
+                .orElseThrow(ResourceNotFoundException::new);
 
         return getUserProfile(user);
     }
 
     public List<UserProfile> getProfiles() {
-        return getUsers().stream()
+        return findAll().stream()
                 .map(this::getUserProfile)
                 .toList();
     }
 
-    private User map(UserRecord record) {
-        return User.builder()
-                .id(record.getId())
-                .username(record.getUsername())
-                .verified(record.getVerified())
-                .userCreateDate(record.getUserCreateDate() == null ? null : record.getUserCreateDate().atZone(ZoneId.systemDefault()))
-                .userLastModifiedDate(record.getUserLastModifiedDate() == null ? null : record.getUserLastModifiedDate().atZone(ZoneId.systemDefault()))
+    private UserProfile getUserProfile(User user) {
+        var tags = repository.findTagsByUserId(user.getId()).stream()
+                .map(entry -> TagMapper.map(entry.getTag()))
+                .toList();
+
+        var ownTickets = ticketService.findByUserId(user.getId());
+        var assignedTickets = ticketService.findByAssignedTo(user.getId());
+
+        return UserProfile.builder()
+                .user(user)
+                .ownTickets(ownTickets)
+                .assignedTickets(assignedTickets)
+                .tags(tags)
                 .build();
     }
 
-    private UserProfile getUserProfile(User user) {
-        var tags = repository.findUserTagsById(user.getId()).stream()
-                .map(entry -> TagMapper.map(entry.getTag()))
-                .toList();
-        // TODO fetch own and assigned tickets by userId
+    public UserProfile updateUserProfile(Long userId, UserProfileInput userProfileInput) {
+        var user = repository.updateDescription(userId, userProfileInput.getDescription())
+                .orElseThrow(ResourceNotFoundException::new);
 
-        return UserProfile.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .createdDate(user.getUserCreateDate())
-                .verified(user.getVerified())
-                .imageUrl("")
-                .ownTickets(List.of())
-                .assignedTickets(List.of())
-                .tags(tags)
-                .build();
+        var tags = userProfileInput.getTags().stream()
+                .map(TagMapper::map)
+                .toList();
+
+        repository.deleteTags(userId);
+        repository.createTags(userId, tags);
+
+        return getUserProfile(UserMapper.map(user));
     }
 }

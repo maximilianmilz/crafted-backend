@@ -15,6 +15,9 @@ public class User {
     @Schema(example = "Julia")
     String username;
 
+    @Schema(example = "Ausgebildete Elektrikerin")
+    String description;
+
     @Schema(example = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee")
     String subject;
 

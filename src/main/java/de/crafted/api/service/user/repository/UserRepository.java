@@ -3,6 +3,7 @@ package de.crafted.api.service.user.repository;
 import static de.crafted.api.service.user.jooq.tables.User.USER;
 import static de.crafted.api.service.common.jooq.tables.UserTag.USER_TAG;
 
+import de.crafted.api.service.common.jooq.enums.Tag;
 import de.crafted.api.service.user.jooq.tables.records.UserRecord;
 import de.crafted.api.service.common.jooq.tables.records.UserTagRecord;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,7 @@ public class UserRepository {
                 .fetchOptional();
     }
 
-    public List<UserTagRecord> findUserTagsById(long userId) {
+    public List<UserTagRecord> findTagsByUserId(long userId) {
         return context.selectFrom(USER_TAG)
                 .where(USER_TAG.USER_ID.eq(userId))
                 .fetch();
@@ -48,11 +49,30 @@ public class UserRepository {
                 .fetchOne();
     }
 
-    public UserRecord update(UserRecord userRecord) {
+    public Optional<UserRecord> updateDescription(long userId, String description) {
         return context.update(USER)
-                .set(userRecord)
-                .where(USER.ID.eq(userRecord.getId()))
+                .set(USER.DESCRIPTION, description)
+                .where(USER.ID.eq(userId))
+                .returning()
+                .fetchOptional();
+    }
+
+    public UserTagRecord createTag(long userId, Tag tag) {
+        return context.insertInto(USER_TAG)
+                .set(USER_TAG.USER_ID, userId)
+                .set(USER_TAG.TAG, tag)
                 .returning()
                 .fetchOne();
+    }
+
+    public void createTags(long userId, List<Tag> tags) {
+        tags.forEach(tag -> createTag(userId, tag));
+    }
+
+    public void deleteTags(long userId) {
+        context.delete(USER_TAG)
+                .where(USER_TAG.USER_ID.eq(userId))
+                .returning()
+                .fetch();
     }
 }

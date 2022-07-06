@@ -14,7 +14,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Optional;
 
 @Slf4j
 @Component
@@ -28,7 +27,7 @@ public class UserInterceptor implements HandlerInterceptor {
 
         if (auth instanceof JwtAuthenticationToken) {
             var userInfo = getUserInfo((JwtAuthenticationToken) auth);
-            Optional<User> user = userService.getUser(userInfo.getSubject());
+            var user = userService.findBySubject(userInfo.getSubject());
 
             if (user.isEmpty()) {
                 createUser(userInfo);

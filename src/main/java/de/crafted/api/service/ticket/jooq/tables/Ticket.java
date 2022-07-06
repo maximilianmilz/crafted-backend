@@ -6,6 +6,7 @@ package de.crafted.api.service.ticket.jooq.tables;
 
 import de.crafted.api.service.ticket.jooq.DefaultSchema;
 import de.crafted.api.service.ticket.jooq.Keys;
+import de.crafted.api.service.ticket.jooq.enums.Status;
 import de.crafted.api.service.ticket.jooq.tables.records.TicketRecord;
 
 import java.time.LocalDateTime;
@@ -65,10 +66,9 @@ public class Ticket extends TableImpl<TicketRecord> {
     public final TableField<TicketRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.nullable(false), this, "");
 
     /**
-     * @deprecated Unknown data type. Please define an explicit {@link org.jooq.Binding} to specify how this type should be handled. Deprecation can be turned off using {@literal <deprecationOnUnknownTypes/>} in your code generator configuration.
+     * The column <code>ticket.status</code>.
      */
-    @Deprecated
-    public final TableField<TicketRecord, Object> STATUS = createField(DSL.name("status"), org.jooq.impl.DefaultDataType.getDefaultDataType("\"public\".\"status\"").nullable(false), this, "");
+    public final TableField<TicketRecord, Status> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR.nullable(false).asEnumDataType(de.crafted.api.service.ticket.jooq.enums.Status.class), this, "");
 
     /**
      * The column <code>ticket.created</code>.
@@ -76,9 +76,9 @@ public class Ticket extends TableImpl<TicketRecord> {
     public final TableField<TicketRecord, LocalDateTime> CREATED = createField(DSL.name("created"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
     /**
-     * The column <code>ticket.account_id</code>.
+     * The column <code>ticket.user_id</code>.
      */
-    public final TableField<TicketRecord, Long> ACCOUNT_ID = createField(DSL.name("account_id"), SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<TicketRecord, Long> USER_ID = createField(DSL.name("user_id"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>ticket.assigned_to</code>.
@@ -169,7 +169,7 @@ public class Ticket extends TableImpl<TicketRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row7<Long, String, String, Object, LocalDateTime, Long, Long> fieldsRow() {
+    public Row7<Long, String, String, Status, LocalDateTime, Long, Long> fieldsRow() {
         return (Row7) super.fieldsRow();
     }
 }

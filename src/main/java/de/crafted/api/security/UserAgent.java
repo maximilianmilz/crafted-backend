@@ -44,7 +44,8 @@ public class UserAgent {
         if (auth instanceof JwtAuthenticationToken) {
             String subject = getSubFromToken((JwtAuthenticationToken) auth);
 
-            return userService.getUser(subject).orElseThrow();
+            return userService.findBySubject(subject)
+                    .orElseThrow(ResourceNotFoundException::new);
         } else {
             throw new ResourceNotFoundException();
         }

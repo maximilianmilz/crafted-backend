@@ -20,4 +20,18 @@ public class TagMapper {
             case montage -> Tag.MONTAGE;
         };
     }
+
+    public static de.crafted.api.service.common.jooq.enums.Tag map(Tag tag) {
+        return switch (tag) {
+            case SANITARY -> de.crafted.api.service.common.jooq.enums.Tag.sanitary;
+            case WOOD -> de.crafted.api.service.common.jooq.enums.Tag.wood;
+            case METAL -> de.crafted.api.service.common.jooq.enums.Tag.metal;
+            case ELECTRIC -> de.crafted.api.service.common.jooq.enums.Tag.electric;
+            case MOVING -> de.crafted.api.service.common.jooq.enums.Tag.moving;
+            case PAINTER -> de.crafted.api.service.common.jooq.enums.Tag.painter;
+            case RENOVATION -> de.crafted.api.service.common.jooq.enums.Tag.renovation;
+            case GARDENING -> de.crafted.api.service.common.jooq.enums.Tag.gardening;
+            case MONTAGE -> de.crafted.api.service.common.jooq.enums.Tag.montage;
+        };
+    }
 }
