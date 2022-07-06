@@ -6,6 +6,7 @@ import static de.crafted.api.service.common.jooq.tables.TicketTag.TICKET_TAG;
 
 import de.crafted.api.service.common.jooq.enums.Tag;
 import de.crafted.api.service.common.jooq.tables.records.TicketTagRecord;
+import de.crafted.api.service.common.model.Order;
 import de.crafted.api.service.ticket.jooq.enums.Status;
 import de.crafted.api.service.ticket.jooq.tables.records.TicketRecord;
 import lombok.RequiredArgsConstructor;
@@ -28,14 +29,22 @@ public class TicketRepository {
                                       Optional<String> userName,
                                       Optional<List<Tag>> tags,
                                       Optional<Boolean> verified,
-                                      Optional<Status> status) {
+                                      Optional<Status> status,
+                                      Optional<Order> createdOrder) {
         Condition condition = createFilterCondition(searchTerm, userName, tags, verified, status);
+
+        var created = TICKET.CREATED.asc();
+
+        if (createdOrder.isPresent()) {
+            created = createdOrder.get().equals(Order.ASC) ? TICKET.CREATED.asc() : TICKET.CREATED.desc();
+        }
+
 
         return context.select().from(TICKET)
                 .leftJoin(USER).on(TICKET.USER_ID.eq(USER.ID))
                 .leftJoin(TICKET_TAG).on(TICKET.ID.eq(TICKET_TAG.TICKET_ID))
                 .where(condition)
-                .orderBy(TICKET.ID.asc())
+                .orderBy(created)
                 .fetchInto(TICKET);
     }
 

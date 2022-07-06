@@ -4,6 +4,7 @@ import de.crafted.api.controller.execption.ForbiddenRequestException;
 import de.crafted.api.controller.execption.ResourceNotFoundException;
 import de.crafted.api.controller.model.TicketInput;
 import de.crafted.api.service.common.mapper.TagMapper;
+import de.crafted.api.service.common.model.Order;
 import de.crafted.api.service.common.model.Tag;
 import de.crafted.api.service.ticket.jooq.enums.Status;
 import de.crafted.api.service.ticket.jooq.tables.records.TicketRecord;
@@ -34,8 +35,9 @@ public class TicketService {
                                 Optional<String> userName,
                                 Optional<List<de.crafted.api.service.common.jooq.enums.Tag>> tags,
                                 Optional<Boolean> verified,
-                                Optional<Status> status) {
-        return repository.findAll(searchTerm, userName, tags, verified, status).stream()
+                                Optional<Status> status,
+                                Optional<Order> createdOrder) {
+        return repository.findAll(searchTerm, userName, tags, verified, status, createdOrder).stream()
                 .map(TicketMapper::map)
                 .toList();
     }
@@ -56,7 +58,8 @@ public class TicketService {
                                            Optional<String> userName,
                                            Optional<List<Tag>> tags,
                                            Optional<Boolean> verified,
-                                           Optional<de.crafted.api.service.ticket.model.Status> status) {
+                                           Optional<de.crafted.api.service.ticket.model.Status> status,
+                                           Optional<Order> createdOrder) {
         Optional<List<de.crafted.api.service.common.jooq.enums.Tag>> mappedTags = Optional.empty();
         Optional<Status> mappedStatus = Optional.empty();
 
@@ -71,7 +74,7 @@ public class TicketService {
         }
 
 
-        return findAll(searchTerm, userName, mappedTags, verified, mappedStatus).stream()
+        return findAll(searchTerm, userName, mappedTags, verified, mappedStatus, createdOrder).stream()
                 .map(this::getTicketInfo)
                 .toList();
     }

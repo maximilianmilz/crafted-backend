@@ -2,6 +2,7 @@ package de.crafted.api.controller;
 
 import de.crafted.api.controller.model.TicketInput;
 import de.crafted.api.security.UserAgent;
+import de.crafted.api.service.common.model.Order;
 import de.crafted.api.service.common.model.Tag;
 import de.crafted.api.service.ticket.TicketService;
 import de.crafted.api.service.ticket.model.Status;
@@ -46,8 +47,9 @@ public class TicketController {
                                            @RequestParam(required = false, name = "username") Optional<String> userName,
                                            @RequestParam(required = false, name = "tags") Optional<List<Tag>> tags,
                                            @RequestParam(required = false, name = "verified") Optional<Boolean> verified,
-                                           @RequestParam(required = false, name = "status") Optional<Status> status) {
-        return ticketService.getTicketInfos(searchTerm, userName, tags, verified, status);
+                                           @RequestParam(required = false, name = "status") Optional<Status> status,
+                                           @RequestParam(required = false, name = "created order") Optional<Order> createdOrder) {
+        return ticketService.getTicketInfos(searchTerm, userName, tags, verified, status, createdOrder);
     }
 
     @Operation(summary = "Create new ticket.")
