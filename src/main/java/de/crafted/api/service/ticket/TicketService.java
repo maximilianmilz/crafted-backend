@@ -12,7 +12,8 @@ import de.crafted.api.service.ticket.mapper.TicketMapper;
 import de.crafted.api.service.ticket.model.Ticket;
 import de.crafted.api.service.ticket.model.TicketInfo;
 import de.crafted.api.service.ticket.repository.TicketRepository;
-import de.crafted.api.service.user.UserService;
+import de.crafted.api.service.user.mapper.UserMapper;
+import de.crafted.api.service.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TicketService {
     private final TicketRepository repository;
-    private final UserService userService;
+    private final UserRepository userRepository;
 
     public List<Ticket> findAll(Optional<String> searchTerm,
                                 Optional<String> userName,
@@ -94,7 +95,7 @@ public class TicketService {
                 .map(entry -> TagMapper.map(entry.getTag()))
                 .toList();
 
-        var user = userService.findById(ticket.getUserId())
+        var user = userRepository.findById(ticket.getUserId()).map(UserMapper::map)
                 .orElseThrow(ResourceNotFoundException::new);
 
         return TicketInfo.builder()
