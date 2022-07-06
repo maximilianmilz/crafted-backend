@@ -12,6 +12,7 @@ import de.crafted.api.service.ticket.mapper.TicketMapper;
 import de.crafted.api.service.ticket.model.Ticket;
 import de.crafted.api.service.ticket.model.TicketInfo;
 import de.crafted.api.service.ticket.repository.TicketRepository;
+import de.crafted.api.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TicketService {
     private final TicketRepository repository;
+    private final UserService userService;
 
     public List<Ticket> findAll(Optional<String> searchTerm,
                                 Optional<String> userName,
@@ -92,8 +94,12 @@ public class TicketService {
                 .map(entry -> TagMapper.map(entry.getTag()))
                 .toList();
 
+        var user = userService.findById(ticket.getUserId())
+                .orElseThrow(ResourceNotFoundException::new);
+
         return TicketInfo.builder()
                 .ticket(ticket)
+                .user(user)
                 .tags(tags)
                 .build();
     }

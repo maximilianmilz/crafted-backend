@@ -41,7 +41,7 @@ public class UserService {
                 .map(UserMapper::map);
     }
 
-    private Optional<User> findById(long id) {
+    public Optional<User> findById(long id) {
         return repository.findById(id)
                 .map(UserMapper::map);
     }
