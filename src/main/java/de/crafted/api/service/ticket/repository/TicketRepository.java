@@ -7,8 +7,10 @@ import static de.crafted.api.service.common.jooq.tables.TicketTag.TICKET_TAG;
 import de.crafted.api.service.common.jooq.enums.Tag;
 import de.crafted.api.service.common.jooq.tables.records.TicketTagRecord;
 import de.crafted.api.service.common.model.Order;
+import de.crafted.api.service.image.mapper.ImageMapper;
 import de.crafted.api.service.ticket.jooq.enums.Status;
 import de.crafted.api.service.ticket.jooq.tables.records.TicketRecord;
+import de.crafted.api.service.ticket.model.TicketInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.Condition;
@@ -127,5 +129,22 @@ public class TicketRepository {
         }
 
         return condition;
+    }
+
+    public Optional<TicketRecord> markAsAssigned(long ticketId, long userId) {
+        return context.update(TICKET)
+                .set(TICKET.STATUS, Status.assign)
+                .set(TICKET.ASSIGNED_TO, userId)
+                .where(TICKET.ID.eq(ticketId))
+                .returning()
+                .fetchOptional();
+    }
+
+    public Optional<TicketRecord> markAsDone(long ticketId) {
+        return context.update(TICKET)
+                .set(TICKET.STATUS, Status.done)
+                .where(TICKET.ID.eq(ticketId))
+                .returning()
+                .fetchOptional();
     }
 }

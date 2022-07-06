@@ -76,4 +76,30 @@ public class TicketController {
         var user = userAgent.getUser();
         return ticketService.update(user.getId(), ticketId, ticketInput);
     }
+
+    @Operation(summary = "Mark ticket as assigned.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Ticket not found", content = @Content)
+    })
+    @PatchMapping("/{ticketId}/assign")
+    public TicketInfo markAsAssigned(@PathVariable Long ticketId) {
+        var user = userAgent.getUser();
+        return ticketService.markAsAssigned(ticketId, user.getId());
+    }
+
+    @Operation(summary = "Mark ticket as done.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Ticket not found", content = @Content)
+    })
+    @PatchMapping("/{ticketId}/done")
+    public TicketInfo markAsDone(@PathVariable Long ticketId) {
+        var user = userAgent.getUser();
+        return ticketService.markAsDone(ticketId, user.getId());
+    }
 }

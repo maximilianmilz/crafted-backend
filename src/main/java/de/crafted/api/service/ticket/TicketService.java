@@ -7,8 +7,6 @@ import de.crafted.api.service.common.mapper.TagMapper;
 import de.crafted.api.service.common.model.Order;
 import de.crafted.api.service.common.model.Tag;
 import de.crafted.api.service.image.ImageService;
-import de.crafted.api.service.image.jooq.tables.records.TicketImageRecord;
-import de.crafted.api.service.image.mapper.ImageMapper;
 import de.crafted.api.service.ticket.jooq.enums.Status;
 import de.crafted.api.service.ticket.jooq.tables.records.TicketRecord;
 import de.crafted.api.service.ticket.mapper.StatusMapper;
@@ -128,8 +126,8 @@ public class TicketService {
         var ticket = repository.create(record);
 
         input.getImages().forEach(entry -> {
-                var image = imageService.create(entry.getUrl(), entry.getAltText());
-                imageService.createTicketImage(ticket.getId(), image.getId());
+            var image = imageService.create(entry.getUrl(), entry.getAltText());
+            imageService.createTicketImage(ticket.getId(), image.getId());
         });
 
 
@@ -138,7 +136,7 @@ public class TicketService {
         return getTicketInfo(TicketMapper.map(ticket));
     }
 
-    public TicketInfo update(long userId, Long ticketId, TicketInput ticketInput) {
+    public TicketInfo update(long userId, long ticketId, TicketInput ticketInput) {
         if (!findById(ticketId).orElseThrow(ResourceNotFoundException::new).getUserId().equals(userId)) {
             throw new ForbiddenRequestException();
         }
@@ -153,5 +151,35 @@ public class TicketService {
         repository.createTags(ticketId, tags);
 
         return getTicketInfo(ticketId);
+    }
+
+    public TicketInfo markAsAssigned(long ticketId, long userId) {
+        var ticket = findById(ticketId)
+                .orElseThrow(ResourceNotFoundException::new);
+
+        if (ticket.getUserId().equals(userId)) {
+            throw new ForbiddenRequestException();
+        }
+
+        var patchedTicket = repository.markAsAssigned(ticketId, userId)
+                .map(TicketMapper::map)
+                .orElseThrow(ResourceNotFoundException::new);
+
+        return getTicketInfo(patchedTicket);
+    }
+
+    public TicketInfo markAsDone(long ticketId, long userId) {
+        var ticket = findById(ticketId)
+                .orElseThrow(ResourceNotFoundException::new);
+
+        if (!ticket.getUserId().equals(userId)) {
+            throw new ForbiddenRequestException();
+        }
+
+        var patchedTicket = repository.markAsDone(ticketId)
+                .map(TicketMapper::map)
+                .orElseThrow(ResourceNotFoundException::new);
+
+        return getTicketInfo(patchedTicket);
     }
 }
