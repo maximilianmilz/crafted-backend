@@ -12,9 +12,9 @@ import java.util.List;
 public class UserProfile {
     User user;
 
-    List<TicketInfo> ownTickets;
+    List<TicketInfo> tickets;
 
-    List<TicketInfo> assignedTickets;
+    List<TicketInfo> projects;
 
     List<Tag> tags;
 }

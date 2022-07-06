@@ -71,13 +71,13 @@ public class UserService {
                 .map(entry -> TagMapper.map(entry.getTag()))
                 .toList();
 
-        var ownTickets = ticketService.findByUserId(user.getId());
-        var assignedTickets = ticketService.findByAssignedTo(user.getId());
+        var tickets = ticketService.findByUserId(user.getId());
+        var projects = ticketService.findByAssignedTo(user.getId());
 
         return UserProfile.builder()
                 .user(user)
-                .ownTickets(ownTickets)
-                .assignedTickets(assignedTickets)
+                .tickets(tickets)
+                .projects(projects)
                 .tags(tags)
                 .build();
     }

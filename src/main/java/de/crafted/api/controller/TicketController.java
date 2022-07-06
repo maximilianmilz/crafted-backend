@@ -2,7 +2,9 @@ package de.crafted.api.controller;
 
 import de.crafted.api.controller.model.TicketInput;
 import de.crafted.api.security.UserAgent;
+import de.crafted.api.service.common.model.Tag;
 import de.crafted.api.service.ticket.TicketService;
+import de.crafted.api.service.ticket.model.Status;
 import de.crafted.api.service.ticket.model.TicketInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -33,14 +36,18 @@ public class TicketController {
         return ticketService.getTicketInfo(ticketId);
     }
 
-    @Operation(summary = "Get all ticket infos.")
+    @Operation(summary = "Get ticket infos.")
     @ApiResponses({
             @ApiResponse(responseCode = "200"),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
     })
     @GetMapping("/")
-    public List<TicketInfo> getTicketInfos() {
-        return ticketService.getTicketInfos();
+    public List<TicketInfo> getTicketInfos(@RequestParam(required = false, name = "search term") Optional<String> searchTerm,
+                                           @RequestParam(required = false, name = "username") Optional<String> userName,
+                                           @RequestParam(required = false, name = "tags") Optional<List<Tag>> tags,
+                                           @RequestParam(required = false, name = "verified") Optional<Boolean> verified,
+                                           @RequestParam(required = false, name = "status") Optional<Status> status) {
+        return ticketService.getTicketInfos(searchTerm, userName, tags, verified, status);
     }
 
     @Operation(summary = "Create new ticket.")

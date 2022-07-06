@@ -1,14 +1,18 @@
 package de.crafted.api.service.ticket.repository;
 
 import static de.crafted.api.service.ticket.jooq.tables.Ticket.TICKET;
+import static de.crafted.api.service.user.jooq.tables.User.USER;
 import static de.crafted.api.service.common.jooq.tables.TicketTag.TICKET_TAG;
 
 import de.crafted.api.service.common.jooq.enums.Tag;
 import de.crafted.api.service.common.jooq.tables.records.TicketTagRecord;
+import de.crafted.api.service.ticket.jooq.enums.Status;
 import de.crafted.api.service.ticket.jooq.tables.records.TicketRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,10 +24,19 @@ import java.util.Optional;
 public class TicketRepository {
     private final DSLContext context;
 
-    public List<TicketRecord> findAll() {
-        return context.selectFrom(TICKET)
+    public List<TicketRecord> findAll(Optional<String> searchTerm,
+                                      Optional<String> userName,
+                                      Optional<List<Tag>> tags,
+                                      Optional<Boolean> verified,
+                                      Optional<Status> status) {
+        Condition condition = createFilterCondition(searchTerm, userName, tags, verified, status);
+
+        return context.select().from(TICKET)
+                .leftJoin(USER).on(TICKET.USER_ID.eq(USER.ID))
+                .leftJoin(TICKET_TAG).on(TICKET.ID.eq(TICKET_TAG.TICKET_ID))
+                .where(condition)
                 .orderBy(TICKET.ID.asc())
-                .fetch();
+                .fetchInto(TICKET);
     }
 
     public Optional<TicketRecord> findById(long id) {
@@ -76,5 +89,34 @@ public class TicketRepository {
                 .where(TICKET.ID.eq(id))
                 .returning()
                 .fetchOptional();
+    }
+
+    private Condition createFilterCondition(Optional<String> searchTerm,
+                                            Optional<String> userName,
+                                            Optional<List<Tag>> tags,
+                                            Optional<Boolean> verified,
+                                            Optional<Status> status) {
+        Condition condition = DSL.noCondition();
+
+        if (searchTerm.isPresent()) {
+            condition = condition.and(TICKET.TITLE.containsIgnoreCase(searchTerm.get())
+                    .or(TICKET.DESCRIPTION.containsIgnoreCase(searchTerm.get())));
+        }
+        if (userName.isPresent()) {
+            condition = condition.and(USER.USERNAME.contains(userName.get()));
+        }
+        if (verified.isPresent()) {
+            condition = condition.and(USER.VERIFIED.eq(verified.get()));
+        }
+        if (status.isPresent()) {
+            condition = condition.and(TICKET.STATUS.eq(status.get()));
+        }
+        if (tags.isPresent()) {
+            for (Tag tag : tags.get()) {
+                condition = condition.and(TICKET_TAG.TAG.eq(tag));
+            }
+        }
+
+        return condition;
     }
 }

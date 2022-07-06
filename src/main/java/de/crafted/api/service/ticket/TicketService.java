@@ -4,8 +4,10 @@ import de.crafted.api.controller.execption.ForbiddenRequestException;
 import de.crafted.api.controller.execption.ResourceNotFoundException;
 import de.crafted.api.controller.model.TicketInput;
 import de.crafted.api.service.common.mapper.TagMapper;
+import de.crafted.api.service.common.model.Tag;
 import de.crafted.api.service.ticket.jooq.enums.Status;
 import de.crafted.api.service.ticket.jooq.tables.records.TicketRecord;
+import de.crafted.api.service.ticket.mapper.StatusMapper;
 import de.crafted.api.service.ticket.mapper.TicketMapper;
 import de.crafted.api.service.ticket.model.Ticket;
 import de.crafted.api.service.ticket.model.TicketInfo;
@@ -25,8 +27,12 @@ import java.util.Optional;
 public class TicketService {
     private final TicketRepository repository;
 
-    public List<Ticket> findAll() {
-        return repository.findAll().stream()
+    public List<Ticket> findAll(Optional<String> searchTerm,
+                                Optional<String> userName,
+                                Optional<List<de.crafted.api.service.common.jooq.enums.Tag>> tags,
+                                Optional<Boolean> verified,
+                                Optional<Status> status) {
+        return repository.findAll(searchTerm, userName, tags, verified, status).stream()
                 .map(TicketMapper::map)
                 .toList();
     }
@@ -43,8 +49,26 @@ public class TicketService {
         return getTicketInfo(ticket);
     }
 
-    public List<TicketInfo> getTicketInfos() {
-        return findAll().stream()
+    public List<TicketInfo> getTicketInfos(Optional<String> searchTerm,
+                                           Optional<String> userName,
+                                           Optional<List<Tag>> tags,
+                                           Optional<Boolean> verified,
+                                           Optional<de.crafted.api.service.ticket.model.Status> status) {
+        Optional<List<de.crafted.api.service.common.jooq.enums.Tag>> mappedTags = Optional.empty();
+        Optional<Status> mappedStatus = Optional.empty();
+
+        if (tags.isPresent()) {
+            mappedTags = Optional.of(tags.get().stream()
+                    .map(TagMapper::map)
+                    .toList());
+        }
+
+        if (status.isPresent()) {
+            mappedStatus = Optional.of(StatusMapper.map(status.get()));
+        }
+
+
+        return findAll(searchTerm, userName, mappedTags, verified, mappedStatus).stream()
                 .map(this::getTicketInfo)
                 .toList();
     }
@@ -95,7 +119,7 @@ public class TicketService {
             throw new ForbiddenRequestException();
         }
 
-        var ticket = repository.update(ticketId, ticketInput.getTitle(), ticketInput.getDescription())
+        repository.update(ticketId, ticketInput.getTitle(), ticketInput.getDescription())
                 .orElseThrow(ResourceNotFoundException::new);
 
         var tags = ticketInput.getTags().stream()
