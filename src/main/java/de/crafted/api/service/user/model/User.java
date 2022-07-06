@@ -1,5 +1,6 @@
 package de.crafted.api.service.user.model;
 
+import de.crafted.api.service.image.model.Image;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Value;
@@ -29,4 +30,6 @@ public class User {
 
     @Schema(example = "2021-07-01T13:24:12.882335+02:00")
     ZonedDateTime userLastModifiedDate;
+
+    Long profilePhotoId;
 }

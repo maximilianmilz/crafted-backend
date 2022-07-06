@@ -1,6 +1,7 @@
 package de.crafted.api.controller.model;
 
 import de.crafted.api.service.common.model.Tag;
+import de.crafted.api.service.image.model.Image;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Value;
@@ -17,4 +18,6 @@ public class TicketInput {
     String description;
 
     List<Tag> tags;
+
+    List<ImageInput> images;
 }

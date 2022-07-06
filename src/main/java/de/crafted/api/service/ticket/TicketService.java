@@ -6,6 +6,9 @@ import de.crafted.api.controller.model.TicketInput;
 import de.crafted.api.service.common.mapper.TagMapper;
 import de.crafted.api.service.common.model.Order;
 import de.crafted.api.service.common.model.Tag;
+import de.crafted.api.service.image.ImageService;
+import de.crafted.api.service.image.jooq.tables.records.TicketImageRecord;
+import de.crafted.api.service.image.mapper.ImageMapper;
 import de.crafted.api.service.ticket.jooq.enums.Status;
 import de.crafted.api.service.ticket.jooq.tables.records.TicketRecord;
 import de.crafted.api.service.ticket.mapper.StatusMapper;
@@ -30,6 +33,7 @@ import java.util.Optional;
 public class TicketService {
     private final TicketRepository repository;
     private final UserRepository userRepository;
+    private final ImageService imageService;
 
     public List<Ticket> findAll(Optional<String> searchTerm,
                                 Optional<String> userName,
@@ -101,10 +105,13 @@ public class TicketService {
         var user = userRepository.findById(ticket.getUserId()).map(UserMapper::map)
                 .orElseThrow(ResourceNotFoundException::new);
 
+        var images = imageService.findByTicketId(ticket.getId());
+
         return TicketInfo.builder()
                 .ticket(ticket)
                 .user(user)
                 .tags(tags)
+                .images(images)
                 .build();
     }
 
@@ -117,7 +124,14 @@ public class TicketService {
         record.setCreated(LocalDateTime.now());
         record.setStatus(Status.open);
 
+
         var ticket = repository.create(record);
+
+        input.getImages().forEach(entry -> {
+                var image = imageService.create(entry.getUrl(), entry.getAltText());
+                imageService.createTicketImage(ticket.getId(), image.getId());
+        });
+
 
         input.getTags().forEach(entry -> repository.createTag(ticket.getId(), TagMapper.map(entry)));
 

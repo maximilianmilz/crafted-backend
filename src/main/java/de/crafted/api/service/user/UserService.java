@@ -3,6 +3,7 @@ package de.crafted.api.service.user;
 import de.crafted.api.controller.execption.ResourceNotFoundException;
 import de.crafted.api.controller.model.UserProfileInput;
 import de.crafted.api.service.common.mapper.TagMapper;
+import de.crafted.api.service.image.ImageService;
 import de.crafted.api.service.ticket.TicketService;
 import de.crafted.api.service.user.jooq.tables.records.UserRecord;
 import de.crafted.api.service.user.mapper.UserMapper;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserRepository repository;
     private final TicketService ticketService;
+    private final ImageService imageService;
 
     public User createUser(String subject, String username) {
         var record = new UserRecord();
@@ -73,6 +75,7 @@ public class UserService {
 
         var tickets = ticketService.findByUserId(user.getId());
         var projects = ticketService.findByAssignedTo(user.getId());
+        var image = imageService.findById(user.getProfilePhotoId());
 
         return UserProfile.builder()
                 .user(user)

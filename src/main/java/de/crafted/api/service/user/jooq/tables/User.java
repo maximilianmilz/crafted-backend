@@ -17,7 +17,7 @@ import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row7;
+import org.jooq.Row8;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -83,6 +83,11 @@ public class User extends TableImpl<UserRecord> {
      * The column <code>user.user_last_modified_date</code>.
      */
     public final TableField<UserRecord, LocalDateTime> USER_LAST_MODIFIED_DATE = createField(DSL.name("user_last_modified_date"), SQLDataType.LOCALDATETIME(6), this, "");
+
+    /**
+     * The column <code>user.image_id</code>.
+     */
+    public final TableField<UserRecord, Long> IMAGE_ID = createField(DSL.name("image_id"), SQLDataType.BIGINT, this, "");
 
     private User(Name alias, Table<UserRecord> aliased) {
         this(alias, aliased, null);
@@ -164,11 +169,11 @@ public class User extends TableImpl<UserRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row7 type methods
+    // Row8 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row7<Long, String, String, String, Boolean, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row7) super.fieldsRow();
+    public Row8<Long, String, String, String, Boolean, LocalDateTime, LocalDateTime, Long> fieldsRow() {
+        return (Row8) super.fieldsRow();
     }
 }

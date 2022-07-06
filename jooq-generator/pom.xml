@@ -148,6 +148,35 @@
                             </generator>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>crafted-image-schema</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <jdbc>
+                                <driver>${spring.datasource.driver-class-name}</driver>
+                                <url>${spring.datasource.url}</url>
+                                <user>${spring.datasource.username}</user>
+                                <password>${spring.datasource.password}</password>
+                            </jdbc>
+                            <generator>
+                                <database>
+                                    <includes>image|ticket_image</includes>
+                                    <inputSchema>public</inputSchema>
+                                    <outputSchemaToDefault>true</outputSchemaToDefault>
+                                </database>
+                                <generate>
+                                    <javaTimeTypes>true</javaTimeTypes>
+                                </generate>
+                                <target>
+                                    <packageName>de.crafted.api.service.image.jooq</packageName>
+                                    <directory>../src/main/java</directory>
+                                </target>
+                            </generator>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
