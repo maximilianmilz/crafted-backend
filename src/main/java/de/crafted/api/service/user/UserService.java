@@ -75,11 +75,12 @@ public class UserService {
 
         var tickets = ticketService.findByUserId(user.getId());
         var projects = ticketService.findByAssignedTo(user.getId());
-        var image = imageService.findById(user.getProfilePhotoId());
+        var image = user.getProfilePhotoId() != null ? imageService.findById(user.getProfilePhotoId()) : null;
 
         return UserProfile.builder()
                 .user(user)
                 .tickets(tickets)
+                .profilePhoto(image)
                 .projects(projects)
                 .tags(tags)
                 .build();
