@@ -54,10 +54,11 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
     })
     @GetMapping("/profiles")
-    public List<UserProfile> getUserProfiles(@RequestParam(required = false) Optional<Boolean> verified,
+    public List<UserProfile> getUserProfiles(@RequestParam(required = false) Optional<String> searchTerm,
+                                             @RequestParam(required = false) Optional<Boolean> verified,
                                              @RequestParam(required = false) Optional<List<Tag>> tags,
                                              @RequestParam(required = false) Optional<Boolean> bestRatingOrder) {
-        return userService.getProfiles(verified, tags, bestRatingOrder);
+        return userService.getProfiles(searchTerm, verified, tags, bestRatingOrder);
     }
 
     @Operation(summary = "Update user profile.")

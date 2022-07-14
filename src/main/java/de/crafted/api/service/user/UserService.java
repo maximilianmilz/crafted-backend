@@ -49,14 +49,14 @@ public class UserService {
                 .map(UserMapper::map);
     }
 
-    public List<User> findAll(Optional<Boolean> verified, Optional<List<Tag>> tags, Optional<Boolean> bestRatingOrder) {
+    public List<User> findAll(Optional<String> searchTerm, Optional<Boolean> verified, Optional<List<Tag>> tags, Optional<Boolean> bestRatingOrder) {
         Optional<List<de.crafted.api.service.common.jooq.enums.Tag>> mappedTags = Optional.empty();
 
         if (tags.isPresent()) {
             mappedTags = Optional.of(tags.get().stream().map(TagMapper::map).toList());
         }
 
-        return repository.findAll(verified, mappedTags, bestRatingOrder)
+        return repository.findAll(searchTerm, verified, mappedTags, bestRatingOrder)
                 .stream()
                 .map(UserMapper::map)
                 .collect(Collectors.toList());
@@ -69,8 +69,8 @@ public class UserService {
         return getUserProfile(user);
     }
 
-    public List<UserProfile> getProfiles(Optional<Boolean> verified, Optional<List<Tag>> tags, Optional<Boolean> bestRatingOrder) {
-        return findAll(verified, tags, bestRatingOrder).stream()
+    public List<UserProfile> getProfiles(Optional<String> searchTerm, Optional<Boolean> verified, Optional<List<Tag>> tags, Optional<Boolean> bestRatingOrder) {
+        return findAll(searchTerm, verified, tags, bestRatingOrder).stream()
                 .map(this::getUserProfile)
                 .toList();
     }

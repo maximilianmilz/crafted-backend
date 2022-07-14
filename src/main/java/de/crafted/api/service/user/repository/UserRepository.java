@@ -20,8 +20,8 @@ import java.util.Optional;
 public class UserRepository {
     private final DSLContext context;
 
-    public List<UserRecord> findAll(Optional<Boolean> verified, Optional<List<Tag>> tags, Optional<Boolean> bestRatingOrder) {
-        Condition condition = createFilterCondition(verified, tags);
+    public List<UserRecord> findAll(Optional<String> searchTerm, Optional<Boolean> verified, Optional<List<Tag>> tags, Optional<Boolean> bestRatingOrder) {
+        Condition condition = createFilterCondition(searchTerm, verified, tags);
 
 
         return context.selectFrom(USER)
@@ -82,9 +82,13 @@ public class UserRepository {
                 .fetch();
     }
 
-    private Condition createFilterCondition(Optional<Boolean> verified, Optional<List<Tag>> tags) {
+    private Condition createFilterCondition(Optional<String> searchTerm, Optional<Boolean> verified, Optional<List<Tag>> tags) {
         Condition condition = DSL.noCondition();
 
+        if (searchTerm.isPresent()) {
+            condition = condition.and(USER.USERNAME.containsIgnoreCase(searchTerm.get())
+                    .or(USER.DESCRIPTION.containsIgnoreCase(searchTerm.get())));
+        }
         if (verified.isPresent()) {
             condition = condition.and(USER.VERIFIED.eq(verified.get()));
         }
