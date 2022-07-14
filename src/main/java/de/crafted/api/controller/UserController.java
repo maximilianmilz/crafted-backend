@@ -2,6 +2,7 @@ package de.crafted.api.controller;
 
 import de.crafted.api.controller.model.UserProfileInput;
 import de.crafted.api.security.UserAgent;
+import de.crafted.api.service.common.model.Tag;
 import de.crafted.api.service.user.UserService;
 import de.crafted.api.service.user.model.UserProfile;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -52,8 +54,10 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
     })
     @GetMapping("/profiles")
-    public List<UserProfile> getUserProfiles() {
-        return userService.getProfiles();
+    public List<UserProfile> getUserProfiles(@RequestParam(required = false) Optional<Boolean> verified,
+                                             @RequestParam(required = false) Optional<List<Tag>> tags,
+                                             @RequestParam(required = false) Optional<Boolean> bestRatingOrder) {
+        return userService.getProfiles(verified, tags, bestRatingOrder);
     }
 
     @Operation(summary = "Update user profile.")

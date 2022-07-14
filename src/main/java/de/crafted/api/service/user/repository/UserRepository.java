@@ -7,7 +7,9 @@ import de.crafted.api.service.common.jooq.enums.Tag;
 import de.crafted.api.service.user.jooq.tables.records.UserRecord;
 import de.crafted.api.service.common.jooq.tables.records.UserTagRecord;
 import lombok.RequiredArgsConstructor;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,9 +20,13 @@ import java.util.Optional;
 public class UserRepository {
     private final DSLContext context;
 
-    public List<UserRecord> findAll() {
+    public List<UserRecord> findAll(Optional<Boolean> verified, Optional<List<Tag>> tags, Optional<Boolean> bestRatingOrder) {
+        Condition condition = createFilterCondition(verified, tags);
+
+
         return context.selectFrom(USER)
-                .orderBy(USER.ID.asc())
+                .where(condition)
+                .orderBy(bestRatingOrder.isPresent() && bestRatingOrder.get() ? USER.RATING.desc() : USER.ID.asc())
                 .fetch();
     }
 
@@ -74,5 +80,22 @@ public class UserRepository {
                 .where(USER_TAG.USER_ID.eq(userId))
                 .returning()
                 .fetch();
+    }
+
+    private Condition createFilterCondition(Optional<Boolean> verified, Optional<List<Tag>> tags) {
+        Condition condition = DSL.noCondition();
+
+        if (verified.isPresent()) {
+            condition = condition.and(USER.VERIFIED.eq(verified.get()));
+        }
+        if (tags.isPresent()) {
+            Condition tagCondition = DSL.noCondition();
+            for (Tag tag : tags.get()) {
+                tagCondition = tagCondition.or(USER_TAG.TAG.eq(tag));
+            }
+            condition = condition.and(tagCondition);
+        }
+
+        return condition;
     }
 }

@@ -3,6 +3,7 @@ package de.crafted.api.service.user;
 import de.crafted.api.controller.execption.ResourceNotFoundException;
 import de.crafted.api.controller.model.UserProfileInput;
 import de.crafted.api.service.common.mapper.TagMapper;
+import de.crafted.api.service.common.model.Tag;
 import de.crafted.api.service.image.ImageService;
 import de.crafted.api.service.ticket.TicketService;
 import de.crafted.api.service.user.jooq.tables.records.UserRecord;
@@ -48,8 +49,14 @@ public class UserService {
                 .map(UserMapper::map);
     }
 
-    public List<User> findAll() {
-        return repository.findAll()
+    public List<User> findAll(Optional<Boolean> verified, Optional<List<Tag>> tags, Optional<Boolean> bestRatingOrder) {
+        Optional<List<de.crafted.api.service.common.jooq.enums.Tag>> mappedTags = Optional.empty();
+
+        if (tags.isPresent()) {
+            mappedTags = Optional.of(tags.get().stream().map(TagMapper::map).toList());
+        }
+
+        return repository.findAll(verified, mappedTags, bestRatingOrder)
                 .stream()
                 .map(UserMapper::map)
                 .collect(Collectors.toList());
@@ -62,8 +69,8 @@ public class UserService {
         return getUserProfile(user);
     }
 
-    public List<UserProfile> getProfiles() {
-        return findAll().stream()
+    public List<UserProfile> getProfiles(Optional<Boolean> verified, Optional<List<Tag>> tags, Optional<Boolean> bestRatingOrder) {
+        return findAll(verified, tags, bestRatingOrder).stream()
                 .map(this::getUserProfile)
                 .toList();
     }
