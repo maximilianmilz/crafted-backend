@@ -100,8 +100,8 @@ public class TicketService {
                 .map(entry -> TagMapper.map(entry.getTag()))
                 .toList();
 
-        var user = userRepository.findById(ticket.getUserId()).map(UserMapper::map)
-                .orElseThrow(ResourceNotFoundException::new);
+        var user = ticket.getUserId() != null ? userRepository.findById(ticket.getUserId()).map(UserMapper::map)
+                .orElseThrow(ResourceNotFoundException::new) : null;
 
         var images = imageService.findByTicketId(ticket.getId());
 

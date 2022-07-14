@@ -48,4 +48,9 @@ public class ImageService {
 
         return ImageMapper.map(repository.createTicketImage(record));
     }
+
+    public Image findByUserId(long userId) {
+        return repository.findByUserId(userId).map(ImageMapper::map)
+                .orElseThrow(ResourceNotFoundException::new);
+    }
 }

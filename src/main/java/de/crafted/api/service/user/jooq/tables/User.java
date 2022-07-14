@@ -17,7 +17,7 @@ import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row8;
+import org.jooq.Row9;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -88,6 +88,11 @@ public class User extends TableImpl<UserRecord> {
      * The column <code>user.image_id</code>.
      */
     public final TableField<UserRecord, Long> IMAGE_ID = createField(DSL.name("image_id"), SQLDataType.BIGINT, this, "");
+
+    /**
+     * The column <code>user.rating</code>.
+     */
+    public final TableField<UserRecord, Integer> RATING = createField(DSL.name("rating"), SQLDataType.INTEGER, this, "");
 
     private User(Name alias, Table<UserRecord> aliased) {
         this(alias, aliased, null);
@@ -169,11 +174,11 @@ public class User extends TableImpl<UserRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row8 type methods
+    // Row9 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row8<Long, String, String, String, Boolean, LocalDateTime, LocalDateTime, Long> fieldsRow() {
-        return (Row8) super.fieldsRow();
+    public Row9<Long, String, String, String, Boolean, LocalDateTime, LocalDateTime, Long, Integer> fieldsRow() {
+        return (Row9) super.fieldsRow();
     }
 }

@@ -2,6 +2,7 @@ package de.crafted.api.service.image.repository;
 
 import static de.crafted.api.service.image.jooq.tables.Image.IMAGE;
 import static de.crafted.api.service.image.jooq.tables.TicketImage.TICKET_IMAGE;
+import static de.crafted.api.service.user.jooq.tables.User.USER;
 
 import de.crafted.api.service.image.jooq.tables.records.ImageRecord;
 import de.crafted.api.service.image.jooq.tables.records.TicketImageRecord;
@@ -44,5 +45,12 @@ public class ImageRepository {
                 .set(record)
                 .returning()
                 .fetchOne();
+    }
+
+    public Optional<ImageRecord> findByUserId(long userId) {
+        return context.select().from(IMAGE)
+                .leftJoin(USER).on(IMAGE.ID.eq(USER.ID))
+                .where(USER.ID.eq(userId))
+                .fetchOptionalInto(IMAGE);
     }
 }

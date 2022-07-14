@@ -20,6 +20,7 @@ public class UserMapper {
                 .userCreateDate(record.getUserCreateDate() == null ? null : record.getUserCreateDate().atZone(ZoneId.systemDefault()))
                 .userLastModifiedDate(record.getUserLastModifiedDate() == null ? null : record.getUserLastModifiedDate().atZone(ZoneId.systemDefault()))
                 .profilePhotoId(record.getImageId())
+                .rating(record.getRating())
                 .build();
     }
 }

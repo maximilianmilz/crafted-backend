@@ -20,11 +20,11 @@ DROP TABLE IF EXISTS ticket;
 CREATE TABLE ticket
 (
     id          BIGSERIAL PRIMARY KEY,
-    title       VARCHAR                       NOT NULL,
-    description TEXT                          NOT NULL,
-    status      STATUS                        NOT NULL,
-    created     TIMESTAMP                     NOT NULL,
-    user_id     BIGINT REFERENCES "user" (id) NOT NULL,
+    title       VARCHAR   NOT NULL,
+    description TEXT      NOT NULL,
+    status      STATUS    NOT NULL,
+    created     TIMESTAMP NOT NULL,
+    user_id     BIGINT REFERENCES "user" (id),
     assigned_to BIGINT REFERENCES "user" (id)
 );
 
